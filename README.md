@@ -1,100 +1,146 @@
-# Daily Habit Tracker iOS App
+# Daily Habit Tracker Web App
 
-A simple and elegant iOS app for tracking daily habits with checkboxes and streak counters.
+A simple and elegant web app for tracking daily habits with checkboxes and streak counters. Deployable to Netlify and works on all devices!
 
 ## Features
 
 - ✅ Daily checkbox for each habit
 - 🔥 Streak counter to track consecutive days
 - ➕ Add custom habits
-- 🗑️ Swipe to delete habits
-- 💾 Automatic data persistence
-- 📱 Native iOS design with SwiftUI
+- 🗑️ Delete habits with confirmation
+- 💾 Automatic data persistence (localStorage)
+- 📱 Mobile-friendly responsive design
+- 🚀 Progressive Web App (PWA) - installable on mobile
+- 🌐 Works offline after first visit
+- ⚡ Fast and lightweight
+
+## Live Demo
+
+Deploy this to Netlify in seconds!
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/checked)
 
 ## Project Structure
 
 ```
 checked/
-├── HabitTrackerApp.swift      # Main app entry point
-├── Models/
-│   ├── Habit.swift             # Habit data model
-│   └── HabitStore.swift        # Data persistence and management
-└── Views/
-    ├── ContentView.swift       # Main habit list view
-    ├── HabitRow.swift          # Individual habit row component
-    └── AddHabitView.swift      # Add new habit screen
+├── index.html              # Main HTML structure
+├── styles.css              # Styling and responsive design
+├── app.js                  # Habit tracking logic
+├── manifest.json           # PWA manifest
+├── service-worker.js       # Service worker for offline support
+├── netlify.toml            # Netlify configuration
+├── _redirects              # Netlify redirects
+├── icon-192.png            # App icon (192x192)
+└── icon-512.png            # App icon (512x512)
 ```
 
-## How to Set Up in Xcode
+## How to Deploy to Netlify
 
-Since this repository contains Swift source files without the Xcode project files, follow these steps to create the project:
+### Option 1: Deploy via Git (Recommended)
 
-### Option 1: Create New Xcode Project (Recommended)
+1. Push this repository to GitHub
+2. Go to [Netlify](https://app.netlify.com/)
+3. Click "Add new site" → "Import an existing project"
+4. Connect your GitHub account
+5. Select this repository
+6. Click "Deploy site"
 
-1. Open Xcode
-2. Select "Create a new Xcode project"
-3. Choose "iOS" → "App" → Click "Next"
-4. Fill in the project details:
-   - Product Name: `HabitTracker` (or any name you prefer)
-   - Team: Your team (or leave as None for personal use)
-   - Organization Identifier: `com.yourname` (or your identifier)
-   - Interface: **SwiftUI**
-   - Language: **Swift**
-   - Storage: None (we're using UserDefaults)
-5. Choose this `checked` folder as the location
-6. Delete the default `ContentView.swift` and `HabitTrackerApp.swift` files that Xcode creates
-7. In Xcode, right-click on the project navigator and select "Add Files to HabitTracker"
-8. Add all the Swift files from this repository:
-   - `HabitTrackerApp.swift`
-   - `Models/` folder with both files
-   - `Views/` folder with all view files
+That's it! Your habit tracker will be live in seconds.
 
-### Option 2: Manual Xcode Project Setup
+### Option 2: Drag and Drop Deploy
 
-1. Open Xcode
-2. Select File → New → Project
-3. Choose iOS → App
-4. Set the project name and ensure SwiftUI is selected
-5. Save in a different location first
-6. Copy all `.swift` files from this repository into the Xcode project
-7. Organize them into groups matching the folder structure
+1. Go to [Netlify Drop](https://app.netlify.com/drop)
+2. Drag the entire `checked` folder onto the page
+3. Your site will be deployed instantly
 
-## Running the App
+### Option 3: Netlify CLI
 
-1. Open the project in Xcode
-2. Select a simulator or your iPhone as the target device
-3. Press `Cmd + R` or click the Play button to build and run
-4. The app will launch with three sample habits (Exercise, Read, Meditate)
+```bash
+npm install -g netlify-cli
+cd checked
+netlify deploy --prod
+```
+
+## Running Locally
+
+Simply open `index.html` in any modern web browser, or use a local server:
+
+```bash
+# Using Python 3
+python -m http.server 8000
+
+# Using Node.js (http-server)
+npx http-server
+
+# Using PHP
+php -S localhost:8000
+```
+
+Then visit `http://localhost:8000` in your browser.
 
 ## How to Use
 
-1. **Check off a habit**: Tap the circle next to any habit to mark it complete for today
-2. **Add a new habit**: Tap the "+" button in the top right
-3. **Delete a habit**: Swipe left on any habit and tap "Delete"
-4. **View streak**: Complete a habit multiple days in a row to see your streak count
+1. **Check off a habit**: Click the circle next to any habit to mark it complete for today
+2. **Add a new habit**: Click the "+" button in the top right
+3. **Delete a habit**: Click the trash icon and confirm deletion
+4. **View streak**: Complete a habit multiple days in a row to see your streak count (🔥)
+5. **Install as app**: On mobile, use "Add to Home Screen" for app-like experience
 
-## Requirements
+## Browser Support
 
-- iOS 15.0 or later
-- Xcode 13.0 or later
-- Swift 5.5 or later
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari (latest)
+- Mobile browsers (iOS Safari, Chrome Mobile)
 
 ## Data Persistence
 
-All habits and completion data are automatically saved to UserDefaults, so your progress persists between app launches.
+All habits and completion data are automatically saved to your browser's localStorage, so your progress persists between sessions. Data is stored locally on your device only.
+
+## Progressive Web App (PWA)
+
+This app can be installed on your phone like a native app:
+
+- **iOS**: Open in Safari → Tap Share → "Add to Home Screen"
+- **Android**: Open in Chrome → Tap menu → "Install app"
+
+Once installed, the app works offline and provides a native app experience!
 
 ## Customization Ideas
 
-Here are some ways you can extend this app:
+Extend this app with these features:
 
-- Add different habit categories (health, productivity, social, etc.)
+- Add habit categories (health, productivity, social, etc.)
 - Include time-of-day tracking (morning/evening habits)
 - Add weekly/monthly statistics and graphs
-- Implement notifications/reminders
+- Implement browser notifications/reminders
 - Add habit notes or journal entries
 - Create different themes or color schemes
 - Add goals (e.g., complete 30 days in a row)
-- Export habit data to CSV
+- Export habit data to JSON/CSV
+- Cloud sync with Firebase or Supabase
+- Dark mode toggle
+
+## Custom Domain
+
+After deploying to Netlify, you can easily add a custom domain:
+
+1. Go to Site settings → Domain management
+2. Click "Add custom domain"
+3. Follow the instructions to configure DNS
+
+## Environment Variables
+
+No environment variables needed! This is a pure frontend app with no backend dependencies.
+
+## Security
+
+- All data is stored locally in the browser
+- No server-side processing
+- No data collection or tracking
+- HTTPS enforced by Netlify
+- Security headers configured in `netlify.toml`
 
 ## License
 

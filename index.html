@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Track your daily habits with simple checkboxes and streak counters">
+    <meta name="theme-color" content="#4CAF50">
+    <title>Daily Habit Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Daily Habits</h1>
+            <button id="addHabitBtn" class="add-btn" aria-label="Add new habit">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </header>
+
+        <div class="date-display">
+            <p id="currentDate"></p>
+        </div>
+
+        <div id="habitsList" class="habits-list">
+            <!-- Habits will be dynamically added here -->
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <p>No habits yet. Click the + button to add your first habit!</p>
+        </div>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div id="addHabitModal" class="modal">
+        <div class="modal-content">
+            <h2>New Habit</h2>
+            <input
+                type="text"
+                id="habitNameInput"
+                placeholder="Enter habit name"
+                maxlength="50"
+                autocomplete="off"
+            >
+            <div class="modal-buttons">
+                <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
+                <button id="saveHabitBtn" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
