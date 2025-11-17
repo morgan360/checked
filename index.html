@@ -14,13 +14,33 @@
     <div class="container">
         <header>
             <h1>Habit Tracker</h1>
-            <button id="addHabitBtn" class="add-btn" aria-label="Add new habit">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <line x1="12" y1="5" x2="12" y2="19"></line>
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                </svg>
-            </button>
+            <div class="header-actions">
+                <button id="menuBtn" class="menu-btn" aria-label="Menu">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="5" r="1"></circle>
+                        <circle cx="12" cy="19" r="1"></circle>
+                    </svg>
+                </button>
+                <button id="addHabitBtn" class="add-btn" aria-label="Add new habit">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
+            </div>
         </header>
+
+        <!-- Menu Dropdown -->
+        <div id="menuDropdown" class="menu-dropdown">
+            <button id="exportBtn" class="menu-item">
+                <span>📥</span> Export Data
+            </button>
+            <button id="importBtn" class="menu-item">
+                <span>📤</span> Import Data
+            </button>
+        </div>
+        <input type="file" id="importFileInput" accept=".json" style="display: none;">
 
         <div id="habitSelector" class="habit-selector">
             <!-- Habit tabs will be dynamically added here -->

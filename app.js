@@ -779,6 +779,99 @@ class HabitTracker {
         }
     }
 
+    // Export data to JSON file
+    exportData() {
+        const dataStr = JSON.stringify(this.habits, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+
+        const url = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = url;
+
+        const date = new Date().toISOString().split('T')[0];
+        link.download = `habit-tracker-backup-${date}.json`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        this.closeMenu();
+        alert('Data exported successfully!');
+    }
+
+    // Import data from JSON file
+    importData() {
+        const fileInput = document.getElementById('importFileInput');
+        fileInput.click();
+    }
+
+    // Handle file import
+    handleFileImport(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const importedHabits = JSON.parse(e.target.result);
+
+                // Validate data structure
+                if (!Array.isArray(importedHabits)) {
+                    throw new Error('Invalid data format');
+                }
+
+                // Validate each habit has required fields
+                for (const habit of importedHabits) {
+                    if (!habit.id || !habit.name || !habit.startDate || !Array.isArray(habit.completedDates)) {
+                        throw new Error('Invalid habit data structure');
+                    }
+                }
+
+                // Ask user if they want to merge or replace
+                const shouldMerge = confirm(
+                    'Do you want to MERGE with existing data?\n\n' +
+                    'Click OK to merge (keep both old and new habits)\n' +
+                    'Click Cancel to replace (delete all current habits)'
+                );
+
+                if (shouldMerge) {
+                    // Merge: Add imported habits that don't exist
+                    const existingIds = new Set(this.habits.map(h => h.id));
+                    const newHabits = importedHabits.filter(h => !existingIds.has(h.id));
+                    this.habits = [...this.habits, ...newHabits];
+                } else {
+                    // Replace: Use imported data
+                    this.habits = importedHabits;
+                }
+
+                this.saveHabits();
+                this.currentHabitId = this.habits.length > 0 ? this.habits[0].id : null;
+                this.render();
+                this.closeMenu();
+
+                alert(`Successfully imported ${importedHabits.length} habit(s)!`);
+            } catch (error) {
+                alert('Error importing data: ' + error.message + '\n\nPlease make sure the file is a valid habit tracker backup.');
+            }
+        };
+
+        reader.readAsText(file);
+        event.target.value = ''; // Reset input
+    }
+
+    // Toggle menu dropdown
+    toggleMenu() {
+        const menuDropdown = document.getElementById('menuDropdown');
+        menuDropdown.classList.toggle('active');
+    }
+
+    // Close menu
+    closeMenu() {
+        const menuDropdown = document.getElementById('menuDropdown');
+        menuDropdown.classList.remove('active');
+    }
+
     // Escape HTML to prevent XSS
     escapeHtml(text) {
         const div = document.createElement('div');
@@ -810,6 +903,25 @@ class HabitTracker {
             tab.addEventListener('click', () => {
                 this.switchView(tab.dataset.view);
             });
+        });
+
+        // Menu button listener
+        const menuBtn = document.getElementById('menuBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const importBtn = document.getElementById('importBtn');
+        const importFileInput = document.getElementById('importFileInput');
+
+        menuBtn.addEventListener('click', () => this.toggleMenu());
+        exportBtn.addEventListener('click', () => this.exportData());
+        importBtn.addEventListener('click', () => this.importData());
+        importFileInput.addEventListener('change', (e) => this.handleFileImport(e));
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            const menuDropdown = document.getElementById('menuDropdown');
+            if (!menuBtn.contains(e.target) && !menuDropdown.contains(e.target)) {
+                this.closeMenu();
+            }
         });
 
         // Close modal on outside click
