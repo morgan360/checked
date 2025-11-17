@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Track your daily habits with simple checkboxes and streak counters">
+    <meta name="description" content="Track your daily habits with calendar checkboxes">
     <meta name="theme-color" content="#4CAF50">
     <title>Daily Habit Tracker</title>
     <link rel="stylesheet" href="styles.css">
@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Daily Habits</h1>
+            <h1>Habit Tracker</h1>
             <button id="addHabitBtn" class="add-btn" aria-label="Add new habit">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -22,12 +22,12 @@
             </button>
         </header>
 
-        <div class="date-display">
-            <p id="currentDate"></p>
+        <div id="habitSelector" class="habit-selector">
+            <!-- Habit tabs will be dynamically added here -->
         </div>
 
-        <div id="habitsList" class="habits-list">
-            <!-- Habits will be dynamically added here -->
+        <div id="habitView" class="habit-view">
+            <!-- Calendar view will be rendered here -->
         </div>
 
         <div id="emptyState" class="empty-state">
@@ -35,20 +35,42 @@
         </div>
     </div>
 
-    <!-- Add Habit Modal -->
-    <div id="addHabitModal" class="modal">
+    <!-- Add/Edit Habit Modal -->
+    <div id="habitModal" class="modal">
         <div class="modal-content">
-            <h2>New Habit</h2>
-            <input
-                type="text"
-                id="habitNameInput"
-                placeholder="Enter habit name"
-                maxlength="50"
-                autocomplete="off"
-            >
+            <h2 id="modalTitle">New Habit</h2>
+            <div class="form-group">
+                <label for="habitNameInput">Habit Name</label>
+                <input
+                    type="text"
+                    id="habitNameInput"
+                    placeholder="e.g., Daily Meditation"
+                    maxlength="50"
+                    autocomplete="off"
+                >
+            </div>
+            <div class="form-group">
+                <label for="habitGoalInput">Goal (optional)</label>
+                <input
+                    type="text"
+                    id="habitGoalInput"
+                    placeholder="e.g., 2 minutes of meditation every day"
+                    maxlength="100"
+                    autocomplete="off"
+                >
+            </div>
+            <div class="form-group">
+                <label for="habitStartDate">Start Date</label>
+                <input
+                    type="date"
+                    id="habitStartDate"
+                >
+            </div>
             <div class="modal-buttons">
+                <button id="deleteHabitBtn" class="btn btn-danger" style="display:none;">Delete</button>
+                <div style="flex: 1;"></div>
                 <button id="cancelBtn" class="btn btn-secondary">Cancel</button>
-                <button id="saveHabitBtn" class="btn btn-primary">Add</button>
+                <button id="saveHabitBtn" class="btn btn-primary">Save</button>
             </div>
         </div>
     </div>
