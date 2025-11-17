@@ -1,10 +1,12 @@
-// Habit Tracker App - Calendar View
+// Habit Tracker App - Multiple Views
 class HabitTracker {
     constructor() {
         this.habits = this.loadHabits();
         this.currentHabitId = null;
         this.currentMonth = new Date();
         this.editingHabitId = null;
+        this.currentView = 'calendar'; // calendar, weekly, yearly, graph
+        this.currentYear = new Date().getFullYear();
 
         this.initializeEventListeners();
         this.render();
@@ -245,7 +247,7 @@ class HabitTracker {
         this.renderHabitView();
     }
 
-    // Render the calendar view for current habit
+    // Render the appropriate view for current habit
     renderHabitView() {
         const habitView = document.getElementById('habitView');
         const emptyState = document.getElementById('emptyState');
@@ -262,6 +264,28 @@ class HabitTracker {
 
         const habit = this.habits.find(h => h.id === this.currentHabitId);
         if (!habit) return;
+
+        // Dispatch to appropriate view renderer
+        switch (this.currentView) {
+            case 'weekly':
+                this.renderWeeklyView(habit);
+                break;
+            case 'yearly':
+                this.renderYearlyView(habit);
+                break;
+            case 'graph':
+                this.renderGraphView(habit);
+                break;
+            default:
+                this.renderCalendarView(habit);
+        }
+
+        this.renderHabitTabs();
+    }
+
+    // Render the calendar view for current habit
+    renderCalendarView(habit) {
+        const habitView = document.getElementById('habitView');
 
         const streak = this.calculateStreak(habit);
         const totalDays = habit.completedDates.length;
@@ -364,7 +388,331 @@ class HabitTracker {
         }
 
         habitView.innerHTML = html;
-        this.renderHabitTabs();
+    }
+
+    // Render weekly view
+    renderWeeklyView(habit) {
+        const habitView = document.getElementById('habitView');
+        const streak = this.calculateStreak(habit);
+        const totalDays = habit.completedDates.length;
+
+        // Generate header
+        let html = `
+            <div class="habit-header">
+                <div class="habit-title">
+                    ${this.escapeHtml(habit.name)}
+                    <button class="edit-habit-btn" onclick="habitTracker.openEditModal('${habit.id}')">✏️ Edit</button>
+                </div>
+                ${habit.goal ? `<div class="habit-goal">Goal: ${this.escapeHtml(habit.goal)}</div>` : ''}
+                <div class="habit-start-date">Start Date: ${this.formatDateDisplay(habit.startDate)}</div>
+                <div class="habit-stats">
+                    <div class="stat-item">
+                        🔥 Current Streak: <span class="stat-value">${streak}</span> days
+                    </div>
+                    <div class="stat-item">
+                        ✓ Total Completed: <span class="stat-value">${totalDays}</span> days
+                    </div>
+                </div>
+            </div>
+            <div class="weekly-view">
+        `;
+
+        // Generate weeks from start date to now
+        const startDate = this.parseDate(habit.startDate);
+        const today = new Date();
+        const weeks = this.generateWeeksData(startDate, today, habit);
+
+        weeks.reverse().forEach((week, index) => {
+            const completedDays = week.days.filter(d => d && d.completed).length;
+            const totalAvailableDays = week.days.filter(d => d && !d.future).length;
+            const completionRate = totalAvailableDays > 0 ? Math.round((completedDays / totalAvailableDays) * 100) : 0;
+
+            html += `
+                <div class="weekly-summary-card">
+                    <div class="week-header">
+                        <div class="week-title">${week.label}</div>
+                        <div class="week-completion">${completedDays}/${totalAvailableDays} days (${completionRate}%)</div>
+                    </div>
+                    <div class="week-days">
+            `;
+
+            ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].forEach((dayName, dayIndex) => {
+                const dayData = week.days[dayIndex];
+                if (dayData) {
+                    const statusClass = dayData.future ? 'future' : (dayData.completed ? 'completed' : '');
+                    const icon = dayData.completed ? '✓' : '';
+                    html += `
+                        <div class="week-day-item">
+                            <div class="week-day-label">${dayName}</div>
+                            <div class="week-day-status ${statusClass}">${icon}</div>
+                        </div>
+                    `;
+                } else {
+                    html += `<div class="week-day-item"></div>`;
+                }
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        habitView.innerHTML = html;
+    }
+
+    // Generate weeks data
+    generateWeeksData(startDate, endDate, habit) {
+        const weeks = [];
+        let currentWeekStart = new Date(startDate);
+
+        // Adjust to Monday
+        const day = currentWeekStart.getDay();
+        const diff = day === 0 ? -6 : 1 - day;
+        currentWeekStart.setDate(currentWeekStart.getDate() + diff);
+
+        while (currentWeekStart <= endDate) {
+            const weekDays = [];
+            const weekStartDate = new Date(currentWeekStart);
+            const weekEndDate = new Date(currentWeekStart);
+            weekEndDate.setDate(weekEndDate.getDate() + 6);
+
+            for (let i = 0; i < 7; i++) {
+                const date = new Date(currentWeekStart);
+                date.setDate(date.getDate() + i);
+                const dateStr = this.formatDate(date);
+
+                if (date < startDate || date > endDate) {
+                    weekDays.push(null);
+                } else {
+                    weekDays.push({
+                        date: dateStr,
+                        completed: habit.completedDates.includes(dateStr),
+                        future: this.isFutureDate(dateStr)
+                    });
+                }
+            }
+
+            const monthName = weekStartDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            const endMonthName = weekEndDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+            weeks.push({
+                label: `${monthName} - ${endMonthName}`,
+                days: weekDays
+            });
+
+            currentWeekStart.setDate(currentWeekStart.getDate() + 7);
+        }
+
+        return weeks;
+    }
+
+    // Render yearly view
+    renderYearlyView(habit) {
+        const habitView = document.getElementById('habitView');
+        const streak = this.calculateStreak(habit);
+        const totalDays = habit.completedDates.length;
+
+        let html = `
+            <div class="habit-header">
+                <div class="habit-title">
+                    ${this.escapeHtml(habit.name)}
+                    <button class="edit-habit-btn" onclick="habitTracker.openEditModal('${habit.id}')">✏️ Edit</button>
+                </div>
+                ${habit.goal ? `<div class="habit-goal">Goal: ${this.escapeHtml(habit.goal)}</div>` : ''}
+                <div class="habit-start-date">Start Date: ${this.formatDateDisplay(habit.startDate)}</div>
+                <div class="habit-stats">
+                    <div class="stat-item">
+                        🔥 Current Streak: <span class="stat-value">${streak}</span> days
+                    </div>
+                    <div class="stat-item">
+                        ✓ Total Completed: <span class="stat-value">${totalDays}</span> days
+                    </div>
+                </div>
+            </div>
+            <div class="yearly-view">
+                <div class="year-selector">
+                    <button class="year-nav-btn" onclick="habitTracker.changeYear(-1)">← Previous</button>
+                    <div class="current-year">${this.currentYear}</div>
+                    <button class="year-nav-btn" onclick="habitTracker.changeYear(1)">Next →</button>
+                </div>
+                <div class="months-grid">
+        `;
+
+        // Generate 12 months
+        for (let month = 0; month < 12; month++) {
+            const monthDate = new Date(this.currentYear, month, 1);
+            const monthName = monthDate.toLocaleDateString('en-US', { month: 'long' });
+            const daysInMonth = new Date(this.currentYear, month + 1, 0).getDate();
+
+            html += `
+                <div class="month-card">
+                    <div class="month-card-title">${monthName}</div>
+                    <div class="month-days-grid">
+            `;
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(this.currentYear, month, day);
+                const dateStr = this.formatDate(date);
+                const startDate = this.parseDate(habit.startDate);
+
+                let cellClass = 'month-day-cell';
+                if (habit.completedDates.includes(dateStr)) {
+                    cellClass += ' completed';
+                } else if (this.isFutureDate(dateStr) || date < startDate) {
+                    cellClass += ' future';
+                }
+
+                html += `<div class="${cellClass}"></div>`;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+        }
+
+        html += `
+                </div>
+            </div>
+        `;
+
+        habitView.innerHTML = html;
+    }
+
+    // Change year in yearly view
+    changeYear(delta) {
+        this.currentYear += delta;
+        this.renderHabitView();
+    }
+
+    // Render graph view
+    renderGraphView(habit) {
+        const habitView = document.getElementById('habitView');
+        const streak = this.calculateStreak(habit);
+        const totalDays = habit.completedDates.length;
+
+        // Calculate statistics
+        const startDate = this.parseDate(habit.startDate);
+        const today = new Date();
+        const totalPossibleDays = Math.floor((today - startDate) / (1000 * 60 * 60 * 24)) + 1;
+        const completionRate = Math.round((totalDays / totalPossibleDays) * 100);
+        const bestStreak = this.calculateBestStreak(habit);
+
+        // Calculate last 7 days
+        const last7Days = [];
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateStr = this.formatDate(date);
+            last7Days.push({
+                date: dateStr,
+                dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
+                completed: habit.completedDates.includes(dateStr)
+            });
+        }
+
+        let html = `
+            <div class="habit-header">
+                <div class="habit-title">
+                    ${this.escapeHtml(habit.name)}
+                    <button class="edit-habit-btn" onclick="habitTracker.openEditModal('${habit.id}')">✏️ Edit</button>
+                </div>
+                ${habit.goal ? `<div class="habit-goal">Goal: ${this.escapeHtml(habit.goal)}</div>` : ''}
+                <div class="habit-start-date">Start Date: ${this.formatDateDisplay(habit.startDate)}</div>
+            </div>
+            <div class="graph-view">
+                <div class="stats-overview">
+                    <div class="stat-card">
+                        <div class="stat-card-value">${totalDays}</div>
+                        <div class="stat-card-label">Total Days Completed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value">${completionRate}%</div>
+                        <div class="stat-card-label">Completion Rate</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value">${streak}</div>
+                        <div class="stat-card-label">Current Streak</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-value">${bestStreak}</div>
+                        <div class="stat-card-label">Best Streak</div>
+                    </div>
+                </div>
+
+                <div class="completion-chart">
+                    <div class="chart-title">Last 7 Days</div>
+                    <div class="chart-bars">
+        `;
+
+        last7Days.forEach(day => {
+            const height = day.completed ? 100 : 20;
+            html += `
+                <div class="chart-bar" style="height: ${height}%;">
+                    <div class="chart-bar-value">${day.completed ? '✓' : ''}</div>
+                    <div class="chart-bar-label">${day.dayName}</div>
+                </div>
+            `;
+        });
+
+        html += `
+                    </div>
+                </div>
+
+                <div class="streak-chart">
+                    <div class="best-streak">
+                        <div class="best-streak-value">🔥 ${bestStreak}</div>
+                        <div class="best-streak-label">Best Streak Ever</div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        habitView.innerHTML = html;
+    }
+
+    // Calculate best streak ever
+    calculateBestStreak(habit) {
+        if (habit.completedDates.length === 0) return 0;
+
+        const sortedDates = habit.completedDates
+            .map(d => this.parseDate(d))
+            .sort((a, b) => a - b);
+
+        let bestStreak = 1;
+        let currentStreak = 1;
+
+        for (let i = 1; i < sortedDates.length; i++) {
+            const prevDate = sortedDates[i - 1];
+            const currDate = sortedDates[i];
+            const dayDiff = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+
+            if (dayDiff === 1) {
+                currentStreak++;
+                bestStreak = Math.max(bestStreak, currentStreak);
+            } else {
+                currentStreak = 1;
+            }
+        }
+
+        return bestStreak;
+    }
+
+    // Switch view
+    switchView(view) {
+        this.currentView = view;
+
+        // Update view tabs
+        document.querySelectorAll('.view-tab').forEach(tab => {
+            tab.classList.remove('active');
+            if (tab.dataset.view === view) {
+                tab.classList.add('active');
+            }
+        });
+
+        this.renderHabitView();
     }
 
     // Open modal for adding new habit
@@ -456,6 +804,13 @@ class HabitTracker {
         cancelBtn.addEventListener('click', () => this.closeModal());
         saveHabitBtn.addEventListener('click', () => this.saveHabitFromModal());
         deleteHabitBtn.addEventListener('click', () => this.confirmDeleteHabit());
+
+        // View tab listeners
+        document.querySelectorAll('.view-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.switchView(tab.dataset.view);
+            });
+        });
 
         // Close modal on outside click
         modal.addEventListener('click', (e) => {

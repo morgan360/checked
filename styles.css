@@ -101,6 +101,37 @@ h1 {
     border-color: var(--primary-color);
 }
 
+/* View Selector Tabs */
+.view-selector {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.view-tab {
+    background: var(--card-background);
+    border: 2px solid var(--border-color);
+    padding: 10px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.view-tab:hover {
+    border-color: var(--primary-color);
+    background: rgba(76, 175, 80, 0.05);
+}
+
+.view-tab.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
 /* Habit View */
 .habit-view {
     background: var(--card-background);
@@ -531,4 +562,257 @@ h1 {
 
 .habit-selector::-webkit-scrollbar-thumb:hover {
     background: #999;
+}
+
+/* Weekly View Styles */
+.weekly-view {
+    margin-top: 20px;
+}
+
+.weekly-summary-card {
+    background: var(--background);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.week-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.week-title {
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.week-completion {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.week-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.week-day-item {
+    text-align: center;
+}
+
+.week-day-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.week-day-status {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background: var(--background);
+    border: 2px solid var(--border-color);
+}
+
+.week-day-status.completed {
+    background: var(--checkbox-checked);
+    border-color: var(--checkbox-checked);
+    color: white;
+}
+
+.week-day-status.future {
+    opacity: 0.3;
+}
+
+/* Yearly View Styles */
+.yearly-view {
+    margin-top: 20px;
+}
+
+.year-selector {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.year-nav-btn {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.year-nav-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.current-year {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.months-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.month-card {
+    background: var(--background);
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.month-card-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.month-days-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.month-day-cell {
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    background: var(--border-color);
+    margin: 0 auto;
+}
+
+.month-day-cell.completed {
+    background: var(--checkbox-checked);
+}
+
+.month-day-cell.future {
+    opacity: 0.2;
+}
+
+/* Graph View Styles */
+.graph-view {
+    margin-top: 20px;
+}
+
+.stats-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--background);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    border: 2px solid var(--border-color);
+}
+
+.stat-card-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 8px;
+}
+
+.stat-card-label {
+    font-size: 14px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.completion-chart {
+    background: var(--background);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.chart-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.chart-bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 200px;
+    gap: 8px;
+}
+
+.chart-bar {
+    flex: 1;
+    background: var(--primary-color);
+    border-radius: 4px 4px 0 0;
+    min-height: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.chart-bar:hover {
+    opacity: 0.8;
+}
+
+.chart-bar-label {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.chart-bar-value {
+    position: absolute;
+    top: -20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.streak-chart {
+    background: var(--background);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.best-streak {
+    text-align: center;
+    padding: 24px;
+}
+
+.best-streak-value {
+    font-size: 48px;
+    font-weight: 700;
+    color: #FF6B35;
+}
+
+.best-streak-label {
+    font-size: 16px;
+    color: var(--text-secondary);
+    margin-top: 8px;
 }
